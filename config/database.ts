@@ -2,6 +2,7 @@ import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/lucid'
 
 const dbConfig = defineConfig({
+  prettyPrintDebugQueries: true,
   connection: 'sqlite',
   connections: {
     sqlite: {
@@ -10,6 +11,7 @@ const dbConfig = defineConfig({
         filename: app.tmpPath('db.sqlite3'),
       },
       useNullAsDefault: true,
+      debug: true,
       migrations: {
         paths: ['database/migrations'],
         naturalSort: true,
