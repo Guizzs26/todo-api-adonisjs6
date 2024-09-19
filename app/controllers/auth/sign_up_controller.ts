@@ -3,12 +3,8 @@ import { signUpUserValidator } from '#validators/auth/sign_up'
 import User from '#models/user'
 
 export default class SignUpController {
-  async signUp({ request, response, auth }: HttpContext) {
-    const { email, password } = await request.validateUsing(signUpUserValidator, {
-      meta: {
-        userId: auth.user!.id,
-      },
-    })
+  async signUp({ request, response }: HttpContext) {
+    const { email, password } = await request.validateUsing(signUpUserValidator, {})
 
     const user = await User.create({ email, password })
 

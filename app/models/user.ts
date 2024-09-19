@@ -13,8 +13,6 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
-  static accessTokens = DbAccessTokensProvider.forModel(User)
-
   @column({ isPrimary: true })
   declare id: number
 
@@ -32,4 +30,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @hasMany(() => Task)
   declare tasks: HasMany<typeof Task>
+
+  static accessTokens = DbAccessTokensProvider.forModel(User, {
+    expiresIn: '1 day',
+    prefix: 'oat_',
+    table: 'auth_access_tokens',
+    type: 'auth_token',
+    tokenSecretLength: 50,
+  })
 }
