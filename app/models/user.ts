@@ -1,9 +1,9 @@
+import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 import { compose } from '@adonisjs/core/helpers'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import { withAuthFinder } from '@adonisjs/auth/mixins/lucid'
 import { DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
-import type { HasMany } from '@adonisjs/lucid/types/relations'
 import hash from '@adonisjs/core/services/hash'
 import Task from './task.js'
 

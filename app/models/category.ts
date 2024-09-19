@@ -1,6 +1,6 @@
-import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
 import type { HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, hasMany } from '@adonisjs/lucid/orm'
+import { DateTime } from 'luxon'
 import Task from './task.js'
 
 export default class Category extends BaseModel {
