@@ -1,4 +1,5 @@
 import router from '@adonisjs/core/services/router'
+import { middleware } from './kernel.js'
 
 const SignUpController = () => import('#controllers/auth/sign_up_controller')
 const SignInController = () => import('#controllers/auth/sign_in_controller')
@@ -8,6 +9,9 @@ router
   .group(() => {
     router.post('signUp', [SignUpController, 'signUp']).as('auth.signUp')
     router.post('signIn', [SignInController, 'signIn']).as('auth.signIn')
-    router.post('signOut', [SignOutController, 'signOut']).as('auth.signOut')
+    router
+      .post('signOut', [SignOutController, 'signOut'])
+      .as('auth.signOut')
+      .use(middleware.auth({ guards: ['api'] }))
   })
   .prefix('auth')
