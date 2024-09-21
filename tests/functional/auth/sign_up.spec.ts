@@ -15,9 +15,9 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
+          message: 'The email field is required',
           rule: 'required',
           field: 'email',
-          message: 'The email field is required',
         },
       ],
     })
@@ -32,9 +32,9 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
+          message: 'The password field is required',
           rule: 'required',
           field: 'password',
-          message: 'The password field is required',
         },
       ],
     })
@@ -50,9 +50,12 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
-          rule: 'required',
-          field: 'password_confirmation',
-          message: 'The password_confirmation field is required',
+          message: 'The password field must be confirmed',
+          rule: 'confirmed',
+          field: 'password',
+          meta: {
+            otherField: 'password_confirmation',
+          },
         },
       ],
     })
@@ -69,9 +72,9 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
+          message: 'The value is not a valid email address',
           rule: 'email',
           field: 'email',
-          message: 'The email must be a valid email address',
         },
       ],
     })
@@ -80,18 +83,20 @@ test.group('creating user', () => {
   test('should fail when password is less than 8 characters', async ({ client }) => {
     const response = await client.post(resource).json({
       email: 'user@example.com',
-      password: 'secret123',
-      password_confirmation: 'secret123',
+      password: 'secret1',
+      password_confirmation: 'secret1',
     })
 
     response.assertStatus(422)
-
     response.assertBodyContains({
       errors: [
         {
+          message: 'The password field must be 8 characters long',
           rule: 'minLength',
           field: 'password',
-          message: 'The password must be at least 8 characters long',
+          meta: {
+            min: 8,
+          },
         },
       ],
     })
@@ -108,9 +113,12 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
+          message: 'The password field must be 32 characters long',
           rule: 'maxLength',
           field: 'password',
-          message: 'The password cannot be longer than 32 characters',
+          meta: {
+            max: 32,
+          },
         },
       ],
     })
@@ -123,14 +131,16 @@ test.group('creating user', () => {
       password_confirmation: 'differentpassword',
     })
 
-    response.assertStatus(400)
-
+    response.assertStatus(422)
     response.assertBodyContains({
       errors: [
         {
+          message: 'The password field must be confirmed',
           rule: 'confirmed',
           field: 'password',
-          message: 'Password confirmation does not match',
+          meta: {
+            otherField: 'password_confirmation',
+          },
         },
       ],
     })
@@ -174,9 +184,9 @@ test.group('creating user', () => {
     response.assertBodyContains({
       errors: [
         {
-          rule: 'unique',
+          message: 'The email has already been taken',
+          rule: 'database.unique',
           field: 'email',
-          message: 'The email is already registered',
         },
       ],
     })
