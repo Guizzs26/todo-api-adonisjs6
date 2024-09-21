@@ -2,7 +2,7 @@ import { test } from '@japa/runner'
 
 const resource = '/auth/signUp'
 
-test.group('creating user', () => {
+test.group('creating user (sign-up)', () => {
   test('should fail when email is missing', async ({ client }) => {
     const response = await client.post(resource).json({
       password: 'secret123',
@@ -144,27 +144,6 @@ test.group('creating user', () => {
     })
   })
 
-  test('should successfully create user when valid email, password, and password_confirmation are provided', async ({
-    client,
-  }) => {
-    const response = await client.post(resource).json({
-      email: 'newuser@example.com',
-      password: 'validpassword123',
-      password_confirmation: 'validpassword123',
-    })
-
-    response.assertStatus(201)
-    response.assertBodyContains({
-      message: 'User created successfully',
-      user: {
-        email: 'user@example.com',
-        id: (value: number) => typeof value === 'number',
-        createdAt: (value: Date) => !!value,
-        updatedAt: (value: Date) => !!value,
-      },
-    })
-  })
-
   test('should fail when email is already registered', async ({ client }) => {
     await client.post('/auth/signUp').json({
       email: 'user@example.com',
@@ -187,6 +166,27 @@ test.group('creating user', () => {
           field: 'email',
         },
       ],
+    })
+  })
+
+  test('should successfully create user when valid email, password, and password_confirmation are provided', async ({
+    client,
+  }) => {
+    const response = await client.post(resource).json({
+      email: 'newuser@example.com',
+      password: 'validpassword123',
+      password_confirmation: 'validpassword123',
+    })
+
+    response.assertStatus(201)
+    response.assertBodyContains({
+      message: 'User created successfully',
+      user: {
+        email: 'newuser@example.com',
+        id: (value: number) => typeof value === 'number',
+        createdAt: (value: Date) => !!value,
+        updatedAt: (value: Date) => !!value,
+      },
     })
   })
 })
