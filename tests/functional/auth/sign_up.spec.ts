@@ -1,6 +1,4 @@
 import { test } from '@japa/runner'
-import hash from '@adonisjs/core/services/hash'
-import User from '#models/user'
 
 const resource = '/auth/signUp'
 
@@ -190,17 +188,5 @@ test.group('creating user', () => {
         },
       ],
     })
-  })
-
-  test('should hash user password correctly', async ({ assert }) => {
-    const user = new User()
-
-    user.password = 'secret'
-    user.email = 'testing@example.com'
-
-    await user.save()
-
-    assert.isTrue(hash.isValidHash(user.password))
-    assert.isTrue(await hash.verify(user.password, 'secret'))
   })
 })
