@@ -146,11 +146,11 @@ test.group('creating user', () => {
     })
   })
 
-  test('Created user - should pass when valid email, password, and password_confirmation are provided', async ({
+  test('should successfully create user when valid email, password, and password_confirmation are provided', async ({
     client,
   }) => {
     const response = await client.post(resource).json({
-      email: 'user@example.com',
+      email: 'newuser@example.com',
       password: 'validpassword123',
       password_confirmation: 'validpassword123',
     })
@@ -192,11 +192,11 @@ test.group('creating user', () => {
     })
   })
 
-  test('hashes user password', async ({ assert }) => {
+  test('should hash user password correctly', async ({ assert }) => {
     const user = new User()
 
     user.password = 'secret'
-    user.email = 'user@example.com'
+    user.email = 'testing@example.com'
 
     await user.save()
 
