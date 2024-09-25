@@ -5,9 +5,11 @@ const resource = '/auth/signIn'
 
 test.group('authenticate user (sign-in)', () => {
   test('should fail when email is missing', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       password: 'secret123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -22,9 +24,11 @@ test.group('authenticate user (sign-in)', () => {
   })
 
   test('should fail when password is missing', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'test@gmail.com',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -39,10 +43,12 @@ test.group('authenticate user (sign-in)', () => {
   })
 
   test('should fail when an invalid email is provided', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'invalid-email',
       password: 'secret123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -57,10 +63,12 @@ test.group('authenticate user (sign-in)', () => {
   })
 
   test('should fail when email is not registered', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'unregistered@example.com',
       password: 'secret123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(400)
     response.assertBodyContains({
@@ -78,10 +86,12 @@ test.group('authenticate user (sign-in)', () => {
       password: 'validpassword123',
     })
 
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
       password: 'invalidpassword',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(400)
     response.assertBodyContains({
@@ -99,10 +109,12 @@ test.group('authenticate user (sign-in)', () => {
       password: 'validpassword123',
     })
 
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'uniqueusertest@example.com',
       password: 'validpassword123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(200)
     response.assertBodyContains({

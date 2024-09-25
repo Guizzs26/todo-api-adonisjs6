@@ -1,13 +1,17 @@
+import User from '#models/user'
+import hash from '@adonisjs/core/services/hash'
 import { test } from '@japa/runner'
 
 const resource = '/auth/signUp'
 
 test.group('creating user (sign-up)', () => {
   test('should fail when email is missing', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       password: 'secret123',
       password_confirmation: 'secret123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -22,9 +26,11 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when password is missing', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -39,10 +45,12 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when password confirmation is missing', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
       password: '12345678',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -60,11 +68,13 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when an invalid email is provided', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'invalid-email',
       password: 'secret123',
       password_confirmation: 'secret123',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -79,11 +89,13 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when password is less than 8 characters', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
       password: 'secret1',
       password_confirmation: 'secret1',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -101,11 +113,13 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when password is more than 32 characters', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
       password: 'a'.repeat(33),
       password_confirmation: 'a'.repeat(33),
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -123,11 +137,13 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when password and password_confirmation do not match', async ({ client }) => {
-    const response = await client.post(resource).json({
+    const payload = {
       email: 'user@example.com',
       password: 'validpassword',
       password_confirmation: 'differentpassword',
-    })
+    }
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -145,17 +161,15 @@ test.group('creating user (sign-up)', () => {
   })
 
   test('should fail when email is already registered', async ({ client }) => {
-    await client.post('/auth/signUp').json({
+    const payload = {
       email: 'user@example.com',
       password: 'validpassword',
       password_confirmation: 'validpassword',
-    })
+    }
 
-    const response = await client.post('/auth/signUp').json({
-      email: 'user@example.com',
-      password: 'anotherpassword',
-      password_confirmation: 'anotherpassword',
-    })
+    await client.post(resource).json(payload) // Pre-register user
+
+    const response = await client.post(resource).json(payload)
 
     response.assertStatus(422)
     response.assertBodyContains({
@@ -169,13 +183,28 @@ test.group('creating user (sign-up)', () => {
     })
   })
 
-  test('should successfully create user when valid email, password, and password_confirmation are provided', async ({
+  test('should hash user password correctly', async ({ assert }) => {
+    const user = new User()
+    user.password = 'secret'
+    user.email = 'testing@example.com'
+
+    await user.save()
+
+    assert.isTrue(hash.isValidHash(user.password))
+    assert.isTrue(await hash.verify(user.password, 'secret'))
+  })
+
+  test('should successfully create user when valid email, password and password_confirmation are provided', async ({
     client,
   }) => {
-    const response = await client.post(resource).json({
+    const user = {
       email: 'newuser@example.com',
       password: 'validpassword123',
       password_confirmation: 'validpassword123',
+    }
+
+    const response = await client.post(resource).json({
+      user,
     })
 
     response.assertStatus(201)
