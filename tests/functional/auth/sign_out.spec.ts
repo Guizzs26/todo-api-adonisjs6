@@ -16,7 +16,30 @@ test.group('logout user (sign-out)', () => {
     response.assertBodyContains({ message: 'Successfully logged out' })
   })
 
-  test('should not allow access to protected routes after logout', async ({ client }) => {})
+  test('should not allow access to protected routes after logout', async ({ client }) => {
+    const createUserPayload = {
+      email: 'test@example.com',
+      password: 'secret123456',
+    }
+
+    const user = await User.create(createUserPayload)
+
+    const loginResponsePayload = {
+      email: user.email,
+      password: 'secret123456',
+    }
+
+    const loginResponse = await client.post('/auth/signIn').json(loginResponsePayload)
+
+    const token = loginResponse.body().token.token
+
+    await client.post('/auth/signOut').bearerToken(token)
+
+    const protectedResponse = await client.get('/protected-route').bearerToken(token)
+
+    protectedResponse.assertStatus(401)
+    protectedResponse.assertBodyContains({ errors: [{ message: 'Unauthorized access' }] })
+  })
 
   test('should return 401 when trying to logout without authentication', async ({ client }) => {
     const response = await client.post('/auth/signOut')
@@ -34,5 +57,34 @@ test.group('logout user (sign-out)', () => {
 
     response.assertStatus(401)
     response.assertBodyContains({ errors: [{ message: 'Unauthorized access' }] })
+  })
+
+  test('should only log out the session from the current device', async ({ client }) => {
+    const user = await User.create({
+      email: 'test@example.com',
+      password: 'secret123456',
+    })
+
+    const response1 = await client.post('/auth/signIn').json({
+      email: user.email,
+      password: 'secret123456',
+    })
+
+    const token1 = response1.body().token.token
+
+    const response2 = await client.post('/auth/signIn').json({
+      email: user.email,
+      password: 'secret123456',
+    })
+
+    const token2 = response2.body().token.token
+
+    await client.post('/auth/signOut').bearerToken(token1)
+
+    const protectedResponse1 = await client.get('/protected-route').bearerToken(token1)
+    protectedResponse1.assertStatus(401)
+
+    const protectedResponse2 = await client.get('/protected-route').bearerToken(token2)
+    protectedResponse2.assertStatus(200)
   })
 })

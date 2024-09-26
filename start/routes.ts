@@ -15,3 +15,9 @@ router
       .use(middleware.auth({ guards: ['api'] }))
   })
   .prefix('auth')
+
+router
+  .get('/protected-route', () => {
+    console.log('Protected route test')
+  })
+  .use(middleware.auth({ guards: ['api'] }))
