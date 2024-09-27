@@ -18,7 +18,7 @@ test.group('logout user (sign-out)', () => {
 
   test('should not allow access to protected routes after logout', async ({ client }) => {
     const createUserPayload = {
-      email: 'test@example.com',
+      email: 'testCreateUser@example.com',
       password: 'secret123456',
     }
 
@@ -61,7 +61,7 @@ test.group('logout user (sign-out)', () => {
 
   test('should only log out the session from the current device', async ({ client }) => {
     const user = await User.create({
-      email: 'test@example.com',
+      email: 'testSession@example.com',
       password: 'secret123456',
     })
 

@@ -203,9 +203,7 @@ test.group('creating user (sign-up)', () => {
       password_confirmation: 'validpassword123',
     }
 
-    const response = await client.post(resource).json({
-      user,
-    })
+    const response = await client.post(resource).json(user)
 
     response.assertStatus(201)
     response.assertBodyContains({
